@@ -13,12 +13,10 @@ def index():
 def add_log():
     data = request.json
     try:
-        # Извлекаем данные, которые прислал браузер
         sugar = float(data['sugar'])
         context = data['context']
         notes = data.get('notes', '')
         
-        # Отправляем в базу
         database.add_sugar_log(sugar, context, notes)
         return jsonify({'status': 'success', 'message': 'Запись сохранена!'})
     except Exception as e:
@@ -33,6 +31,24 @@ def get_logs():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+# API для удаления записи (метод DELETE)
+@app.route('/api/delete/<int:log_id>', methods=['DELETE'])
+def delete_log(log_id):
+    try:
+        database.delete_log(log_id)
+        return jsonify({'status': 'success', 'message': 'Запись удалена!'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# API для получения статистики
+@app.route('/api/stats', methods=['GET'])
+def get_stats():
+    try:
+        stats = database.get_stats()
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 if __name__ == '__main__':
-    # Запускаем сервер в режиме отладки (будет сам перезагружаться при изменениях)
-    app.run(debug=True)
+    # Запускаем сервер, открывая его для локальной сети (host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)

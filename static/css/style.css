@@ -40,6 +40,37 @@ input, select, textarea {
     font-family: inherit;
 }
 
+.stats-section {
+    background-color: #eaf2f8;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.stats-section h3 {
+    margin-top: 0;
+    color: #2980b9;
+    border-bottom: none;
+}
+
+.stats-section p {
+    margin-bottom: 0;
+}
+
+.stats-section #avgSugar {
+    font-size: 1.2em;
+}
+
+/* Стили для блока с графиком */
+.chart-section {
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    height: 300px; /* Фиксированная высота для адаптивности */
+}
+
 button {
     padding: 12px 20px;
     background-color: #3498db;
@@ -57,10 +88,28 @@ button:hover {
     background-color: #2980b9;
 }
 
+.delete-btn {
+    background-color: #e74c3c;
+    padding: 6px 12px;
+    font-size: 13px;
+    width: auto;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    min-width: 500px; 
 }
 
 th, td {
@@ -76,4 +125,43 @@ th {
 
 tr:nth-child(even) {
     background-color: #fbfcfc;
+}
+
+#message {
+    margin-top: 15px;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    
+    input, select, textarea, button {
+        font-size: 16px; 
+        padding: 14px; 
+    }
+    
+    th, td {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .delete-btn {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+    }
+    
+    .chart-section {
+        height: 250px; /* На телефонах делаем график чуть ниже */
+    }
 }

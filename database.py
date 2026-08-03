@@ -45,3 +45,29 @@ def get_all_logs():
             'notes': row.Notes if row.Notes else ""
         })
     return logs
+
+# Функция для удаления записи
+def delete_log(log_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM BloodSugarLogs WHERE LogID = ?', (log_id,))
+    conn.commit()
+    conn.close()
+
+# Функция для получения статистики за последние 7 дней
+def get_stats():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT AVG(SugarLevel), COUNT(LogID)
+        FROM BloodSugarLogs
+        WHERE RecordDate >= DATEADD(day, -7, GETDATE())
+    ''')
+    row = cursor.fetchone()
+    conn.close()
+    
+    # Если записей нет, row[0] вернет None. Обрабатываем это:
+    avg_sugar = round(float(row[0]), 1) if row[0] else 0
+    total_logs = row[1] if row[1] else 0
+    
+    return {'avg_sugar': avg_sugar, 'total_logs': total_logs}
