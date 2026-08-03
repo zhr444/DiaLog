@@ -1,18 +1,146 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ЛОГИКА ТЕМНОЙ ТЕМЫ ---
+    const themeToggle = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        themeToggle.textContent = '☀️ Светлая тема';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-theme');
+        let theme = 'light';
+        if (document.body.classList.contains('dark-theme')) {
+            theme = 'dark';
+            themeToggle.textContent = '☀️ Светлая тема';
+        } else {
+            themeToggle.textContent = '🌙 Темная тема';
+        }
+        localStorage.setItem('theme', theme);
+    });
+
+    // --- Элементы авторизации ---
+    const authSection = document.getElementById('auth-section');
+    const appSection = document.getElementById('app-section');
+    const loginBox = document.getElementById('loginBox');
+    const registerBox = document.getElementById('registerBox');
+    const authMessage = document.getElementById('authMessage');
+    const welcomeUser = document.getElementById('welcomeUser');
+
+    // --- Элементы приложения ---
     const form = document.getElementById('sugarForm');
     const historyBody = document.getElementById('historyBody');
     const messageDiv = document.getElementById('message');
-    
     const avgSugarEl = document.getElementById('avgSugar');
     const totalLogsEl = document.getElementById('totalLogs');
 
-    // Глобальная переменная для хранения объекта графика
     let sugarChart = null;
 
-    // Функция создания или обновления графика
+    // --- ЛОГИКА АВТОРИЗАЦИИ ---
+    function checkSession() {
+        fetch('/api/check_session')
+            .then(res => res.json())
+            .then(data => {
+                if (data.logged_in) {
+                    showApp(data.username);
+                } else {
+                    showAuth();
+                }
+            });
+    }
+
+    function showApp(username) {
+        authSection.classList.add('hidden');
+        appSection.classList.remove('hidden');
+        welcomeUser.textContent = `Привет, ${username}!`;
+        loadLogs();
+        loadStats();
+    }
+
+    function showAuth() {
+        appSection.classList.add('hidden');
+        authSection.classList.remove('hidden');
+        loginBox.classList.remove('hidden');
+        registerBox.classList.add('hidden');
+    }
+
+    function showAuthMessage(text, color) {
+        authMessage.textContent = text;
+        authMessage.style.color = color;
+        setTimeout(() => authMessage.textContent = '', 4000);
+    }
+
+    document.getElementById('showRegister').addEventListener('click', (e) => {
+        e.preventDefault();
+        loginBox.classList.add('hidden');
+        registerBox.classList.remove('hidden');
+    });
+
+    document.getElementById('showLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        registerBox.classList.add('hidden');
+        loginBox.classList.remove('hidden');
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('regUsername').value;
+        const password = document.getElementById('regPassword').value;
+
+        fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAuthMessage(data.message, 'green');
+                document.getElementById('registerForm').reset();
+                document.getElementById('showLogin').click(); 
+            } else {
+                showAuthMessage(data.message, 'red');
+            }
+        });
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+
+        fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('loginForm').reset();
+                checkSession(); 
+            } else {
+                showAuthMessage(data.message, 'red');
+            }
+        });
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        fetch('/api/logout', { method: 'POST' })
+            .then(() => {
+                if (sugarChart) {
+                    sugarChart.destroy();
+                    sugarChart = null;
+                }
+                historyBody.innerHTML = '';
+                checkSession();
+            });
+    });
+
+    // --- ЛОГИКА ПРИЛОЖЕНИЯ ---
     function initOrUpdateChart(labels, dataPoints) {
         const ctx = document.getElementById('sugarChart').getContext('2d');
-        
         if (sugarChart) {
             sugarChart.data.labels = labels;
             sugarChart.data.datasets[0].data = dataPoints;
@@ -28,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         borderColor: '#3498db',
                         backgroundColor: 'rgba(52, 152, 219, 0.2)',
                         borderWidth: 2,
-                        tension: 0.3, // Делает линию плавной
+                        tension: 0.3,
                         fill: true,
                         pointRadius: 4,
                         pointBackgroundColor: '#e74c3c'
@@ -37,62 +165,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            suggestedMin: 3.0,
-                            suggestedMax: 10.0
-                        }
-                    }
+                    scales: { y: { suggestedMin: 3.0, suggestedMax: 10.0 } }
                 }
             });
         }
     }
 
-    // Функция определения цвета "светофора"
     function getSugarColor(sugarValue) {
         const sugar = parseFloat(sugarValue);
-        if (sugar < 4.0) return '#f39c12'; // Оранжевый (низкий)
-        if (sugar > 7.0) return '#e74c3c'; // Красный (высокий)
-        return '#27ae60';                  // Зеленый (норма)
+        if (sugar < 4.0) return '#f39c12';
+        if (sugar > 7.0) return '#e74c3c';
+        return '#27ae60';
     }
 
     function loadStats() {
         fetch('/api/stats')
-            .then(response => response.json())
+            .then(res => {
+                if (res.status === 401) throw new Error('Unauthorized');
+                return res.json();
+            })
             .then(data => {
                 avgSugarEl.textContent = data.avg_sugar;
                 totalLogsEl.textContent = data.total_logs;
             })
-            .catch(error => console.error('Ошибка загрузки статистики:', error));
+            .catch(err => console.log(err));
     }
 
     function loadLogs() {
         fetch('/api/logs')
-            .then(response => response.json())
+            .then(res => {
+                if (res.status === 401) throw new Error('Unauthorized');
+                return res.json();
+            })
             .then(data => {
                 historyBody.innerHTML = ''; 
-                
-                // Массивы для графика
                 const chartLabels = [];
                 const chartData = [];
-
-                // Данные из БД идут от новых к старым. Для графика переворачиваем их слева направо.
                 const reversedData = [...data].reverse();
+                
                 reversedData.forEach(log => {
-                    const timeOnly = log.date.split(' ')[1]; // Берем только время для подписи
+                    const timeOnly = log.date.split(' ')[1];
                     chartLabels.push(timeOnly);
                     chartData.push(log.sugar);
                 });
 
-                initOrUpdateChart(chartLabels, chartData); // Рисуем график
+                initOrUpdateChart(chartLabels, chartData);
 
-                // Отрисовка таблицы
                 data.forEach(log => {
                     const row = document.createElement('tr');
-                    
-                    // Получаем нужный цвет для текущего сахара
                     const sugarColor = getSugarColor(log.sugar);
-
                     row.innerHTML = `
                         <td>${log.date}</td>
                         <td style="color: ${sugarColor}; font-size: 1.1em;"><strong>${log.sugar}</strong></td>
@@ -105,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     historyBody.appendChild(row);
                 });
             })
-            .catch(error => console.error('Ошибка загрузки истории:', error));
+            .catch(err => console.log(err));
     }
 
     historyBody.addEventListener('click', (e) => {
@@ -113,21 +234,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = e.target.getAttribute('data-id');
             if (confirm('Точно удалить эту запись?')) {
                 fetch(`/api/delete/${id}`, { method: 'DELETE' })
-                    .then(response => response.json())
+                    .then(res => res.json())
                     .then(data => {
                         if(data.status === 'success') {
                             loadLogs(); 
                             loadStats(); 
                         }
-                    })
-                    .catch(error => console.error('Ошибка удаления:', error));
+                    });
             }
         }
     });
 
     form.addEventListener('submit', (e) => {
         e.preventDefault(); 
-
         const sugar = document.getElementById('sugar').value;
         const context = document.getElementById('context').value;
         const notes = document.getElementById('notes').value;
@@ -137,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sugar, context, notes })
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             if(data.status === 'success') {
                 messageDiv.textContent = 'Запись успешно добавлена!';
@@ -153,6 +272,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    loadLogs();
-    loadStats();
+    checkSession();
 });

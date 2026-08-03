@@ -3,70 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Дневник Диабетика</title>
+    <title>Дневник Диабетика - DiaLog</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Подключаем библиотеку Chart.js для построения графиков -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Дневник Диабетика</h1>
         
-        <div class="form-section">
-            <h2>Новая запись</h2>
-            <form id="sugarForm">
-                <div class="form-group">
-                    <label for="sugar">Уровень сахара (ммоль/л):</label>
-                    <input type="number" step="0.1" id="sugar" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="context">Время замера:</label>
-                    <select id="context" required>
-                        <option value="Натощак">Натощак</option>
-                        <option value="Перед едой">Перед едой</option>
-                        <option value="После еды">После еды</option>
-                        <option value="Перед сном">Перед сном</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="notes">Заметки (еда, самочувствие):</label>
-                    <textarea id="notes" rows="3"></textarea>
-                </div>
-                
-                <button type="submit">Сохранить</button>
-            </form>
-            <div id="message"></div>
+        <!-- Кнопка переключения темы -->
+        <div class="theme-switch-wrapper">
+            <button id="themeToggle" class="theme-btn">🌙 Темная тема</button>
         </div>
 
-        <div class="stats-section">
-            <h3>Статистика за 7 дней</h3>
-            <p>Средний сахар: <strong id="avgSugar">0</strong> ммоль/л | Всего замеров: <strong id="totalLogs">0</strong></p>
+        <!-- БЛОК АВТОРИЗАЦИИ И РЕГИСТРАЦИИ -->
+        <div id="auth-section">
+            <h1 style="text-align: center;">Добро пожаловать в DiaLog</h1>
+            
+            <div id="loginBox" class="form-section">
+                <h2>Вход</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Логин:</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль:</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit">Войти</button>
+                </form>
+                <p class="auth-toggle">Нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a></p>
+            </div>
+
+            <div id="registerBox" class="form-section hidden">
+                <h2>Регистрация</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Придумайте логин:</label>
+                        <input type="text" id="regUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Придумайте пароль:</label>
+                        <input type="password" id="regPassword" required>
+                    </div>
+                    <button type="submit" style="background-color: #27ae60;">Создать аккаунт</button>
+                </form>
+                <p class="auth-toggle">Уже есть аккаунт? <a href="#" id="showLogin">Войти</a></p>
+            </div>
+            
+            <div id="authMessage" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
         </div>
 
-        <!-- Новый блок для отрисовки графика -->
-        <div class="chart-section">
-            <canvas id="sugarChart"></canvas>
-        </div>
+        <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ (Скрыто до успешного входа) -->
+        <div id="app-section" class="hidden">
+            <div class="header-flex">
+                <h1>Дневник Диабетика</h1>
+                <div class="user-controls">
+                    <span id="welcomeUser"></span>
+                    <button id="logoutBtn" class="delete-btn" style="margin-left: 10px;">Выйти</button>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Новая запись</h2>
+                <form id="sugarForm">
+                    <div class="form-group">
+                        <label for="sugar">Уровень сахара (ммоль/л):</label>
+                        <input type="number" step="0.1" id="sugar" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="context">Время замера:</label>
+                        <select id="context" required>
+                            <option value="Натощак">Натощак</option>
+                            <option value="Перед едой">Перед едой</option>
+                            <option value="После еды">После еды</option>
+                            <option value="Перед сном">Перед сном</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Заметки (еда, самочувствие):</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <button type="submit">Сохранить</button>
+                </form>
+                <div id="message"></div>
+            </div>
 
-        <div class="history-section">
-            <h2>История замеров</h2>
-            <div class="table-responsive">
-                <table id="historyTable">
-                    <thead>
-                        <tr>
-                            <th>Дата и время</th>
-                            <th>Сахар</th>
-                            <th>Контекст</th>
-                            <th>Заметки</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyBody">
-                        <!-- Сюда данные будут подгружаться через JS -->
-                    </tbody>
-                </table>
+            <div class="stats-section">
+                <h3>Статистика за 7 дней</h3>
+                <p>Средний сахар: <strong id="avgSugar">0</strong> ммоль/л | Всего замеров: <strong id="totalLogs">0</strong></p>
+            </div>
+
+            <div class="chart-section">
+                <canvas id="sugarChart"></canvas>
+            </div>
+
+            <div class="history-section">
+                <h2>История замеров</h2>
+                <div class="table-responsive">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>Дата и время</th>
+                                <th>Сахар</th>
+                                <th>Контекст</th>
+                                <th>Заметки</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
