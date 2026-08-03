@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- ЛОГИКА ТЕМНОЙ ТЕМЫ ---
     const themeToggle = document.getElementById('themeToggle');
     const currentTheme = localStorage.getItem('theme');
 
@@ -20,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('theme', theme);
     });
 
-    // --- Элементы авторизации ---
     const authSection = document.getElementById('auth-section');
     const appSection = document.getElementById('app-section');
     const loginBox = document.getElementById('loginBox');
@@ -28,16 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const authMessage = document.getElementById('authMessage');
     const welcomeUser = document.getElementById('welcomeUser');
 
-    // --- Элементы приложения ---
     const form = document.getElementById('sugarForm');
     const historyBody = document.getElementById('historyBody');
     const messageDiv = document.getElementById('message');
     const avgSugarEl = document.getElementById('avgSugar');
     const totalLogsEl = document.getElementById('totalLogs');
+    
+    // Элементы для редактирования
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const formTitle = document.getElementById('formTitle');
+    let currentEditId = null; // Хранит ID записи, если мы в режиме редактирования
 
     let sugarChart = null;
 
-    // --- ЛОГИКА АВТОРИЗАЦИИ ---
     function checkSession() {
         fetch('/api/check_session')
             .then(res => res.json())
@@ -134,11 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     sugarChart = null;
                 }
                 historyBody.innerHTML = '';
+                resetFormState(); // Сбрасываем форму при выходе
                 checkSession();
             });
     });
 
-    // --- ЛОГИКА ПРИЛОЖЕНИЯ ---
     function initOrUpdateChart(labels, dataPoints) {
         const ctx = document.getElementById('sugarChart').getContext('2d');
         if (sugarChart) {
@@ -214,12 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.forEach(log => {
                     const row = document.createElement('tr');
                     const sugarColor = getSugarColor(log.sugar);
+                    // Добавлена кнопка "Изменить"
                     row.innerHTML = `
                         <td>${log.date}</td>
                         <td style="color: ${sugarColor}; font-size: 1.1em;"><strong>${log.sugar}</strong></td>
                         <td>${log.context}</td>
                         <td>${log.notes}</td>
                         <td>
+                            <button class="edit-btn" data-id="${log.id}" data-sugar="${log.sugar}" data-context="${log.context}" data-notes="${log.notes}">Изменить</button>
                             <button class="delete-btn" data-id="${log.id}">Удалить</button>
                         </td>
                     `;
@@ -229,7 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.log(err));
     }
 
+    // Делегирование событий: Изменение и Удаление
     historyBody.addEventListener('click', (e) => {
+        // УДАЛЕНИЕ
         if (e.target.classList.contains('delete-btn')) {
             const id = e.target.getAttribute('data-id');
             if (confirm('Точно удалить эту запись?')) {
@@ -239,33 +245,70 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(data.status === 'success') {
                             loadLogs(); 
                             loadStats(); 
+                            if(currentEditId === id) resetFormState(); // Если удалили то, что редактировали
                         }
                     });
             }
         }
+        
+        // РЕДАКТИРОВАНИЕ
+        if (e.target.classList.contains('edit-btn')) {
+            // Подтягиваем данные в форму
+            currentEditId = e.target.getAttribute('data-id');
+            document.getElementById('sugar').value = e.target.getAttribute('data-sugar');
+            document.getElementById('context').value = e.target.getAttribute('data-context');
+            document.getElementById('notes').value = e.target.getAttribute('data-notes');
+            
+            // Меняем интерфейс формы
+            formTitle.textContent = 'Редактирование записи';
+            submitBtn.textContent = 'Обновить запись';
+            cancelEditBtn.classList.remove('hidden');
+            
+            // Скроллим страницу наверх к форме
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     });
 
+    // Функция возврата формы в изначальное состояние
+    function resetFormState() {
+        form.reset();
+        currentEditId = null;
+        formTitle.textContent = 'Новая запись';
+        submitBtn.textContent = 'Сохранить';
+        cancelEditBtn.classList.add('hidden');
+    }
+
+    // Обработка кнопки "Отмена"
+    cancelEditBtn.addEventListener('click', () => {
+        resetFormState();
+    });
+
+    // ОДНА ФОРМА НА ДОБАВЛЕНИЕ И ОБНОВЛЕНИЕ
     form.addEventListener('submit', (e) => {
         e.preventDefault(); 
         const sugar = document.getElementById('sugar').value;
         const context = document.getElementById('context').value;
         const notes = document.getElementById('notes').value;
 
-        fetch('/api/add', {
-            method: 'POST',
+        // Если currentEditId пустой — это POST (Новая), если нет — это PUT (Обновление)
+        const url = currentEditId ? `/api/edit/${currentEditId}` : '/api/add';
+        const method = currentEditId ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sugar, context, notes })
         })
         .then(res => res.json())
         .then(data => {
             if(data.status === 'success') {
-                messageDiv.textContent = 'Запись успешно добавлена!';
+                messageDiv.textContent = data.message;
                 messageDiv.style.color = 'green';
-                form.reset(); 
+                resetFormState(); 
                 loadLogs(); 
                 loadStats(); 
             } else {
-                messageDiv.textContent = 'Ошибка: ' + data.message;
+                messageDiv.textContent = data.message;
                 messageDiv.style.color = 'red';
             }
             setTimeout(() => messageDiv.textContent = '', 3000); 

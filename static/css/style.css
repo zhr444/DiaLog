@@ -92,6 +92,7 @@ button:hover {
     background-color: #2980b9;
 }
 
+/* --- СТИЛИ ДЛЯ КНОПОК ДЕЙСТВИЙ В ТАБЛИЦЕ --- */
 .delete-btn {
     background-color: #e74c3c;
     padding: 6px 12px;
@@ -101,6 +102,18 @@ button:hover {
 
 .delete-btn:hover {
     background-color: #c0392b;
+}
+
+.edit-btn {
+    background-color: #f39c12;
+    padding: 6px 12px;
+    font-size: 13px;
+    width: auto;
+    margin-right: 5px;
+}
+
+.edit-btn:hover {
+    background-color: #d68910;
 }
 
 .table-responsive {
@@ -179,9 +192,6 @@ tr:nth-child(even) {
     text-decoration: underline;
 }
 
-/* =========================================
-   КНОПКА ПЕРЕКЛЮЧЕНИЯ ТЕМЫ
-   ========================================= */
 .theme-switch-wrapper {
     display: flex;
     justify-content: flex-end;
@@ -200,6 +210,34 @@ tr:nth-child(even) {
 
 .theme-btn:hover {
     background-color: #eaf2f8;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.history-header h2 {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin: 0;
+}
+
+.export-btn {
+    background-color: #27ae60;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.export-btn:hover {
+    background-color: #219653;
 }
 
 /* =========================================
@@ -310,13 +348,28 @@ body.dark-theme .theme-btn:hover {
         font-size: 14px;
     }
     
-    .delete-btn {
+    /* Делаем кнопки в таблице удобными для пальцев на телефоне */
+    .delete-btn, .edit-btn {
         width: 100%;
         padding: 10px;
         margin-top: 5px;
+        margin-right: 0;
+        box-sizing: border-box;
     }
     
     .chart-section {
         height: 250px; 
+    }
+
+    .history-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .export-btn {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
     }
 }

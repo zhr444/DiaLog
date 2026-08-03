@@ -22,7 +22,7 @@ def create_user(username, password_hash):
         conn.commit()
         return True
     except pyodbc.IntegrityError:
-        return False # Ошибка, если логин уже занят
+        return False
     finally:
         conn.close()
 
@@ -36,7 +36,7 @@ def get_user_by_username(username):
         return {'id': row.UserID, 'username': row.Username, 'password_hash': row.PasswordHash}
     return None
 
-# --- УПРАВЛЕНИЕ ЗАМЕРАМИ (Теперь с привязкой к user_id) ---
+# --- УПРАВЛЕНИЕ ЗАМЕРАМИ ---
 
 def add_sugar_log(user_id, sugar_level, meal_context, notes):
     conn = get_db_connection()
@@ -71,10 +71,21 @@ def get_all_logs(user_id):
         })
     return logs
 
+# НОВАЯ ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ ЗАПИСИ
+def update_log(log_id, user_id, sugar_level, meal_context, notes):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE BloodSugarLogs 
+        SET SugarLevel = ?, MealContext = ?, Notes = ?
+        WHERE LogID = ? AND UserID = ?
+    ''', (sugar_level, meal_context, notes, log_id, user_id))
+    conn.commit()
+    conn.close()
+
 def delete_log(log_id, user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    # Удаляем только если запись принадлежит текущему пользователю
     cursor.execute('DELETE FROM BloodSugarLogs WHERE LogID = ? AND UserID = ?', (log_id, user_id))
     conn.commit()
     conn.close()
