@@ -1,18 +1,14 @@
 import sqlite3
 from datetime import datetime
 
-# 1. Подключение к локальному файлу базы данных SQLite
 def get_db_connection():
-    # База данных будет автоматически создана в файле dialog.db
     conn = sqlite3.connect('dialog.db', check_same_thread=False)
-    conn.row_factory = sqlite3.Row # Позволяет обращаться к столбцам по именам
+    conn.row_factory = sqlite3.Row 
     return conn
 
-# 2. Автоматическое создание таблиц (SQLite делает это на лету)
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
-    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Users (
             UserID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,7 +16,6 @@ def init_db():
             PasswordHash TEXT NOT NULL
         )
     ''')
-    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS BloodSugarLogs (
             LogID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,10 +33,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Запускаем создание таблиц при каждом старте
 init_db()
-
-# --- УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ ---
 
 def create_user(username, password_hash):
     conn = get_db_connection()
@@ -65,8 +57,6 @@ def get_user_by_username(username):
         return {'id': row['UserID'], 'username': row['Username'], 'password_hash': row['PasswordHash']}
     return None
 
-# --- УПРАВЛЕНИЕ ЗАМЕРАМИ ---
-
 def add_sugar_log(user_id, sugar_level, meal_context, notes, bread_units, portion_grams, food_name):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -81,19 +71,15 @@ def add_sugar_log(user_id, sugar_level, meal_context, notes, bread_units, portio
 def get_all_logs(user_id, start_date=None, end_date=None):
     conn = get_db_connection()
     cursor = conn.cursor()
-    
     query = 'SELECT LogID, RecordDate, SugarLevel, MealContext, Notes, BreadUnits, PortionGrams, FoodName FROM BloodSugarLogs WHERE UserID = ?'
     params = [user_id]
-    
     if start_date:
         query += ' AND RecordDate >= ?'
         params.append(start_date)
     if end_date:
         query += ' AND RecordDate <= ?'
         params.append(end_date + ' 23:59:59')
-        
     query += ' ORDER BY RecordDate DESC'
-    
     cursor.execute(query, params)
     rows = cursor.fetchall()
     conn.close()
@@ -133,7 +119,6 @@ def delete_log(log_id, user_id):
 def get_stats(user_id, start_date=None, end_date=None):
     conn = get_db_connection()
     cursor = conn.cursor()
-    
     query = 'SELECT AVG(SugarLevel), COUNT(LogID) FROM BloodSugarLogs WHERE UserID = ?'
     params = [user_id]
     
@@ -144,7 +129,6 @@ def get_stats(user_id, start_date=None, end_date=None):
         query += ' AND RecordDate <= ?'
         params.append(end_date + ' 23:59:59')
     else:
-        # В SQLite расчет дат за 7 дней пишется иначе
         query += " AND RecordDate >= date('now', '-7 days')"
         
     cursor.execute(query, params)
@@ -153,5 +137,38 @@ def get_stats(user_id, start_date=None, end_date=None):
     
     avg_sugar = round(float(row[0]), 1) if row[0] else 0
     total_logs = row[1] if row[1] else 0
-    
     return {'avg_sugar': avg_sugar, 'total_logs': total_logs}
+
+# --- НОВАЯ ФУНКЦИЯ: Статистика для Администратора ---
+def get_admin_stats():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT COUNT(*) FROM Users')
+    total_users = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT COUNT(*) FROM BloodSugarLogs')
+    total_logs = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT AVG(SugarLevel) FROM BloodSugarLogs')
+    avg_row = cursor.fetchone()[0]
+    platform_avg_sugar = round(float(avg_row), 1) if avg_row else 0
+    
+    cursor.execute('''
+        SELECT u.Username, COUNT(b.LogID) as LogCount 
+        FROM Users u 
+        LEFT JOIN BloodSugarLogs b ON u.UserID = b.UserID 
+        GROUP BY u.UserID
+        ORDER BY LogCount DESC
+    ''')
+    users_activity = []
+    for row in cursor.fetchall():
+        users_activity.append({'username': row[0], 'log_count': row[1]})
+        
+    conn.close()
+    return {
+        'total_users': total_users,
+        'total_logs': total_logs,
+        'platform_avg_sugar': platform_avg_sugar,
+        'users_activity': users_activity
+    }

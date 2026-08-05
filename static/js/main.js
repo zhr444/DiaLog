@@ -216,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const contextMap = {'Натощак': 'time_fast', 'Перед едой': 'time_before', 'После еды': 'time_after', 'Перед сном': 'time_sleep'};
     const foodMap = {'Каша / Крупы': 'food_kasha', 'Суп': 'food_soup', 'Мясо / Рыба с гарниром': 'food_meat', 'Овощи / Салат': 'food_veg', 'Фрукты / Ягоды': 'food_fruit', 'Сладкое / Десерт': 'food_sweet', 'Фастфуд / Снеки': 'food_fast', 'Другое': 'food_other'};
     
-    // Переводы ответов от сервера
     const backendMsgs = {
         'Запись сохранена!': {ru: 'Запись сохранена!', en: 'Record saved!', zh: '记录已保存！', fr: 'Enregistrement sauvegardé!', es: '¡Registro guardado!', de: 'Eintrag gespeichert!', uk: 'Запис збережено!', be: 'Запіс захаваны!', kk: 'Жазба сақталды!', uz: 'Yozuv saqlandi!'},
         'Запись обновлена!': {ru: 'Запись обновлена!', en: 'Record updated!', zh: '记录已更新！', fr: 'Enregistrement mis à jour!', es: '¡Registro actualizado!', de: 'Eintrag aktualisiert!', uk: 'Запис оновлено!', be: 'Запіс абноўлены!', kk: 'Жазба жаңартылды!', uz: 'Yozuv yangilandi!'},
@@ -313,7 +312,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkSession() {
         fetch('/api/check_session').then(r => r.json()).then(data => {
-            if (data.logged_in) { currentUsername = data.username; showApp(); } else showAuth();
+            if (data.logged_in) { 
+                currentUsername = data.username; 
+                showApp(); 
+                
+                // --- НОВАЯ ЛОГИКА ДЛЯ АДМИНА ---
+                if (currentUsername === 'admin') {
+                    document.getElementById('adminBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('adminBtn').classList.add('hidden');
+                }
+                
+            } else { showAuth(); }
         });
     }
 
@@ -373,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `/api/export${currentQueryString}`;
     });
 
-    // --- НОВАЯ КНОПКА: Открытие PDF отчета ---
     document.getElementById('exportPdfBtn').addEventListener('click', () => {
         window.open(`/report${currentQueryString}`, '_blank');
     });

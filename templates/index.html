@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DiaLog</title>
     
-    <!-- Мета-теги для PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#3498db">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/icon.png') }}">
@@ -59,6 +58,8 @@
                 <h1 data-i18n="app_title">Дневник Диабетика</h1>
                 <div class="user-controls">
                     <span id="welcomeUser"></span>
+                    <!-- НОВАЯ КНОПКА АДМИНА -->
+                    <a href="/admin" id="adminBtn" class="action-btn hidden" style="margin-left: 10px; text-decoration: none; padding: 6px 12px; font-size: 13px; display: inline-block;">👑 Админка</a>
                     <button id="logoutBtn" class="delete-btn" style="margin-left: 10px;" data-i18n="btn_logout">Выйти</button>
                 </div>
             </div>
@@ -146,9 +147,7 @@
                 <div class="history-header">
                     <h2 data-i18n="hist_title">История замеров</h2>
                     <div>
-                        <!-- Кнопка CSV осталась -->
                         <button id="exportFilteredBtn" class="export-btn" data-i18n="btn_export">⬇ CSV</button>
-                        <!-- НОВАЯ кнопка для PDF -->
                         <button id="exportPdfBtn" class="export-btn" style="background-color: #e74c3c; margin-left: 10px;" data-i18n="btn_pdf">📄 PDF</button>
                     </div>
                 </div>
