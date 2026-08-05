@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Медицинская выписка - DiaLog</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            color: #000;
+            background: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; }
+        .header p { margin: 5px 0 0 0; font-size: 14px; }
+        .info-block { margin-bottom: 20px; font-size: 16px; line-height: 1.5; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th { background-color: #f0f0f0; }
+        .footer {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-line {
+            border-bottom: 1px solid #000;
+            width: 200px;
+            display: inline-block;
+        }
+        
+        /* Стили исключительно для печати */
+        @media print {
+            @page { margin: 2cm; }
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Выписка из дневника самоконтроля диабета (DiaLog)</h1>
+        <p>Документ сгенерирован автоматически: {{ gen_date }}</p>
+    </div>
+
+    <div class="info-block">
+        <strong>Пациент (Логин):</strong> {{ username }} <br>
+        <strong>Период отчета:</strong> 
+        {% if start and end %}
+            с {{ start }} по {{ end }}
+        {% elif start %}
+            начиная с {{ start }}
+        {% elif end %}
+            по {{ end }}
+        {% else %}
+            За всё время (или последние 7 дней)
+        {% endif %}
+        <br>
+        <strong>Средний уровень сахара за период:</strong> {{ stats.avg_sugar }} ммоль/л <br>
+        <strong>Всего зафиксировано замеров:</strong> {{ stats.total_logs }}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Дата и Время</th>
+                <th>Сахар (ммоль/л)</th>
+                <th>ХЕ / Граммы</th>
+                <th>Еда и Контекст</th>
+                <th>Заметки пациента</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.date }}</td>
+                <td><strong>{{ log.sugar }}</strong></td>
+                <td>
+                    {% if log.bread_units > 0 %}{{ log.bread_units }} ХЕ{% endif %}
+                    {% if log.bread_units > 0 and log.portion_grams > 0 %} / {% endif %}
+                    {% if log.portion_grams > 0 %}{{ log.portion_grams }} г{% endif %}
+                    {% if log.bread_units == 0 and log.portion_grams == 0 %}-{% endif %}
+                </td>
+                <td>
+                    {% if log.food_name %}{{ log.food_name }}<br>{% endif %}
+                    <small><i>{{ log.context }}</i></small>
+                </td>
+                <td>{{ log.notes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <div>
+            <p>Выписку предоставил: _____________________</p>
+        </div>
+        <div>
+            <p>Подпись врача: <span class="signature-line"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // При загрузке страницы браузер сразу вызывает меню печати
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>

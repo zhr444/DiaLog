@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Заметки (самочувствие):", btn_save: "Сохранить", btn_cancel: "Отменить редактирование",
             filter_title: "Период отчета", btn_apply: "Применить фильтр", btn_reset: "Сбросить",
             stats_title: "Статистика (по фильтру)", stats_avg: "Средний сахар: ", mmol: "ммоль/л", stats_total: " | Всего замеров: ",
-            hist_title: "История замеров", btn_export: "⬇ Скачать для врача", th_date: "Дата", th_sugar: "Сахар",
+            hist_title: "История замеров", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Дата", th_sugar: "Сахар",
             th_xe: "ХЕ / Граммы", th_food: "Еда / Контекст", th_actions: "Действия", btn_prev: "◀ Назад", btn_next: "Вперед ▶",
             chart_label: "Сахар (ммоль/л)", btn_update: "Обновить запись", edit_title: "Редактирование записи",
             page_text: "Страница {0} из {1}", welcome_user: "Привет, {0}!", confirm_del: "Точно удалить запись?", unit_xe: "ХЕ", unit_g: "г"
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Notes (well-being):", btn_save: "Save", btn_cancel: "Cancel edit",
             filter_title: "Report Period", btn_apply: "Apply Filter", btn_reset: "Reset",
             stats_title: "Statistics (Filtered)", stats_avg: "Average sugar: ", mmol: "mmol/L", stats_total: " | Total records: ",
-            hist_title: "Measurement History", btn_export: "⬇ Download for Doctor", th_date: "Date", th_sugar: "Sugar",
+            hist_title: "Measurement History", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Date", th_sugar: "Sugar",
             th_xe: "BU / Grams", th_food: "Food / Context", th_actions: "Actions", btn_prev: "◀ Prev", btn_next: "Next ▶",
             chart_label: "Sugar (mmol/L)", btn_update: "Update record", edit_title: "Edit Record",
             page_text: "Page {0} of {1}", welcome_user: "Welcome, {0}!", confirm_del: "Delete this record?", unit_xe: "BU", unit_g: "g"
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "备注 (身体状况):", btn_save: "保存", btn_cancel: "取消编辑",
             filter_title: "报告周期", btn_apply: "应用筛选", btn_reset: "重置",
             stats_title: "统计 (已筛选)", stats_avg: "平均血糖: ", mmol: "mmol/L", stats_total: " | 总记录: ",
-            hist_title: "测量历史", btn_export: "⬇ 导出给医生", th_date: "日期", th_sugar: "血糖",
+            hist_title: "测量历史", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "日期", th_sugar: "血糖",
             th_xe: "碳水单位/克", th_food: "食物/时间", th_actions: "操作", btn_prev: "◀ 上一页", btn_next: "下一页 ▶",
             chart_label: "血糖 (mmol/L)", btn_update: "更新记录", edit_title: "编辑记录",
             page_text: "第 {0} 页，共 {1} 页", welcome_user: "欢迎，{0}！", confirm_del: "确认删除此记录？", unit_xe: "BU", unit_g: "g"
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Notes (état):", btn_save: "Enregistrer", btn_cancel: "Annuler l'édition",
             filter_title: "Période", btn_apply: "Filtrer", btn_reset: "Réinitialiser",
             stats_title: "Statistiques", stats_avg: "Sucre moyen: ", mmol: "mmol/L", stats_total: " | Total: ",
-            hist_title: "Historique", btn_export: "⬇ Télécharger pour le médecin", th_date: "Date", th_sugar: "Sucre",
+            hist_title: "Historique", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Date", th_sugar: "Sucre",
             th_xe: "BU / Grammes", th_food: "Repas / Contexte", th_actions: "Actions", btn_prev: "◀ Préc", btn_next: "Suiv ▶",
             chart_label: "Sucre (mmol/L)", btn_update: "Mettre à jour", edit_title: "Édition",
             page_text: "Page {0} sur {1}", welcome_user: "Bienvenue, {0} !", confirm_del: "Supprimer cet enregistrement ?", unit_xe: "BU", unit_g: "g"
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Notas (bienestar):", btn_save: "Guardar", btn_cancel: "Cancelar",
             filter_title: "Período", btn_apply: "Aplicar filtro", btn_reset: "Resetear",
             stats_title: "Estadísticas", stats_avg: "Azúcar medio: ", mmol: "mmol/L", stats_total: " | Registros: ",
-            hist_title: "Historial", btn_export: "⬇ Descargar para el médico", th_date: "Fecha", th_sugar: "Azúcar",
+            hist_title: "Historial", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Fecha", th_sugar: "Azúcar",
             th_xe: "BU / Gramos", th_food: "Comida / Contexto", th_actions: "Acciones", btn_prev: "◀ Ant", btn_next: "Sig ▶",
             chart_label: "Azúcar (mmol/L)", btn_update: "Actualizar", edit_title: "Editar Registro",
             page_text: "Página {0} de {1}", welcome_user: "¡Hola, {0}!", confirm_del: "¿Borrar este registro?", unit_xe: "BU", unit_g: "g"
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Notizen (Befinden):", btn_save: "Speichern", btn_cancel: "Abbrechen",
             filter_title: "Zeitraum", btn_apply: "Filter anwenden", btn_reset: "Zurücksetzen",
             stats_title: "Statistiken", stats_avg: "Durchschnitt: ", mmol: "mmol/L", stats_total: " | Einträge: ",
-            hist_title: "Verlauf", btn_export: "⬇ Für den Arzt herunterladen", th_date: "Datum", th_sugar: "Zucker",
+            hist_title: "Verlauf", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Datum", th_sugar: "Zucker",
             th_xe: "BE / Gramm", th_food: "Essen / Kontext", th_actions: "Aktionen", btn_prev: "◀ Zurück", btn_next: "Weiter ▶",
             chart_label: "Zucker (mmol/L)", btn_update: "Aktualisieren", edit_title: "Eintrag bearbeiten",
             page_text: "Seite {0} von {1}", welcome_user: "Willkommen, {0}!", confirm_del: "Eintrag löschen?", unit_xe: "BE", unit_g: "g"
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Нотатки (самопочуття):", btn_save: "Зберегти", btn_cancel: "Скасувати",
             filter_title: "Період звіту", btn_apply: "Застосувати", btn_reset: "Скинути",
             stats_title: "Статистика", stats_avg: "Середній цукор: ", mmol: "ммоль/л", stats_total: " | Всього записів: ",
-            hist_title: "Історія вимірів", btn_export: "⬇ Завантажити для лікаря", th_date: "Дата", th_sugar: "Цукор",
+            hist_title: "Історія вимірів", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Дата", th_sugar: "Цукор",
             th_xe: "ХО / Грами", th_food: "Їжа / Контекст", th_actions: "Дії", btn_prev: "◀ Назад", btn_next: "Вперед ▶",
             chart_label: "Цукор (ммоль/л)", btn_update: "Оновити запис", edit_title: "Редагування",
             page_text: "Сторінка {0} з {1}", welcome_user: "Привіт, {0}!", confirm_del: "Точно видалити?", unit_xe: "ХО", unit_g: "г"
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Нататкі (самаадчуванне):", btn_save: "Захаваць", btn_cancel: "Скасаваць",
             filter_title: "Перыяд справаздачы", btn_apply: "Ужыць", btn_reset: "Скінуць",
             stats_title: "Статыстыка", stats_avg: "Сярэдні цукар: ", mmol: "ммоль/л", stats_total: " | Усяго запісаў: ",
-            hist_title: "Гісторыя вымераў", btn_export: "⬇ Спампаваць для лекара", th_date: "Дата", th_sugar: "Цукор",
+            hist_title: "Гісторыя вымераў", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Дата", th_sugar: "Цукор",
             th_xe: "ХА / Грамы", th_food: "Ежа / Кантэкст", th_actions: "Дзеянні", btn_prev: "◀ Назад", btn_next: "Наперад ▶",
             chart_label: "Цукор (ммоль/л)", btn_update: "Абнавіць запіс", edit_title: "Рэдагаванне",
             page_text: "Старонка {0} з {1}", welcome_user: "Прывітанне, {0}!", confirm_del: "Дакладна выдаліць?", unit_xe: "ХА", unit_g: "г"
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Ескертпе (жағдай):", btn_save: "Сақтау", btn_cancel: "Бас тарту",
             filter_title: "Есеп кезеңі", btn_apply: "Сүзгіні қолдану", btn_reset: "Қалпына келтіру",
             stats_title: "Статистика", stats_avg: "Орташа қант: ", mmol: "ммоль/л", stats_total: " | Барлық жазба: ",
-            hist_title: "Өлшеу тарихы", btn_export: "⬇ Дәрігер үшін жүктеу", th_date: "Күні", th_sugar: "Қант",
+            hist_title: "Өлшеу тарихы", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Күні", th_sugar: "Қант",
             th_xe: "НБ / Грамм", th_food: "Тамақ / Контекст", th_actions: "Әрекеттер", btn_prev: "◀ Артқа", btn_next: "Алға ▶",
             chart_label: "Қант (ммоль/л)", btn_update: "Жазбаны жаңарту", edit_title: "Өңдеу",
             page_text: "Бет {0} / {1}", welcome_user: "Сәлем, {0}!", confirm_del: "Жазбаны жою керек пе?", unit_xe: "НБ", unit_g: "г"
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Qaydlar (ahvolingiz):", btn_save: "Saqlash", btn_cancel: "Bekor qilish",
             filter_title: "Hisobot davri", btn_apply: "Filtrni qo'llash", btn_reset: "Tiklash",
             stats_title: "Statistika", stats_avg: "O'rtacha shakar: ", mmol: "mmol/l", stats_total: " | Jami yozuvlar: ",
-            hist_title: "O'lchovlar tarixi", btn_export: "⬇ Shifokor uchun yuklab olish", th_date: "Sana", th_sugar: "Shakar",
+            hist_title: "O'lchovlar tarixi", btn_export: "⬇ CSV", btn_pdf: "📄 PDF", th_date: "Sana", th_sugar: "Shakar",
             th_xe: "NB / Gramm", th_food: "Ovqat / Kontekst", th_actions: "Harakatlar", btn_prev: "◀ Orqaga", btn_next: "Oldinga ▶",
             chart_label: "Shakar (mmol/l)", btn_update: "Yozuvni yangilash", edit_title: "Tahrirlash",
             page_text: "Sahifa {0} / {1}", welcome_user: "Salom, {0}!", confirm_del: "Yozuv o'chirilsinmi?", unit_xe: "NB", unit_g: "g"
@@ -373,6 +373,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `/api/export${currentQueryString}`;
     });
 
+    // --- НОВАЯ КНОПКА: Открытие PDF отчета ---
+    document.getElementById('exportPdfBtn').addEventListener('click', () => {
+        window.open(`/report${currentQueryString}`, '_blank');
+    });
+
     function getSugarColor(sugarValue) {
         const sugar = parseFloat(sugarValue);
         if (sugar < 4.0) return '#f39c12';
@@ -522,16 +527,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkSession();
 
-    // --- НОВОЕ: Регистрация Service Worker для PWA ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => {
-                    console.log('Service Worker зарегистрирован успешно. Область видимости:', registration.scope);
-                })
-                .catch(error => {
-                    console.log('Ошибка регистрации Service Worker:', error);
-                });
+            navigator.serviceWorker.register('/sw.js').catch(error => { console.log('SW Error:', error); });
         });
     }
 });
