@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, jsonify, session, Response
+import os
+from datetime import datetime
+from flask import Flask, render_template, request, jsonify, session, Response, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 import database
 import csv
@@ -7,6 +9,16 @@ import io
 app = Flask(__name__)
 app.secret_key = 'dialog_super_secret_key_2026'
 
+# --- Маршруты для PWA (Service Worker и Manifest) ---
+@app.route('/sw.js')
+def serve_sw():
+    return send_from_directory('static', 'sw.js', mimetype='application/javascript')
+
+@app.route('/manifest.json')
+def serve_manifest():
+    return send_from_directory('static', 'manifest.json', mimetype='application/json')
+
+# --- Основные маршруты ---
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -121,6 +133,19 @@ def export_logs():
         writer.writerow([log['date'], log['sugar'], log['context'], log['food_name'], log['portion_grams'], log['bread_units'], log['notes']])
     output = si.getvalue().encode('utf-8-sig')
     return Response(output, mimetype="text/csv", headers={"Content-Disposition": f"attachment;filename=DiaLog_Report.csv"})
+
+# --- НОВЫЙ МАРШРУТ: Генерация PDF-отчета ---
+@app.route('/report', methods=['GET'])
+def print_report():
+    if 'user_id' not in session: return "Unauthorized", 401
+    start_date = request.args.get('start')
+    end_date = request.args.get('end')
+    
+    logs = database.get_all_logs(session['user_id'], start_date, end_date)
+    stats = database.get_stats(session['user_id'], start_date, end_date)
+    gen_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+    
+    return render_template('report.html', logs=logs, stats=stats, username=session['username'], start=start_date, end=end_date, gen_date=gen_date)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

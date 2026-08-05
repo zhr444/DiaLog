@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             app_title: "Щоденник Діабетика", btn_logout: "Вийти", new_record: "Новий запис", sugar_label: "Цукор (ммоль/л):",
             xe_label: "ХО:", xe_tooltip: "Хлібна одиниця (ХО) — міра вуглеводів. 1 ХО ≈ 10-12 г.",
             xe_ph: "Напр: 2.5", grams_label: "Грами:", grams_ph: "Напр: 150", food_label: "Що ви їли:",
-            food_none: "(Не вказую)", food_kasha: "Каша / Крупи", food_soup: "Суп", food_meat: "М'ясо / Риба з гарніром",
+            food_none: "(Не вказую)", food_kasha: "Каша / Крупы", food_soup: "Суп", food_meat: "М'ясо / Риба з гарніром",
             food_veg: "Овочі / Салат", food_fruit: "Фрукти / Ягоди", food_sweet: "Солодке / Десерт", food_fast: "Фастфуд / Снеки",
             food_other: "Інше (напишу сам)...", food_custom_ph: "Напишіть свою їжу...", time_label: "Час виміру:",
             time_fast: "Натщесерце", time_before: "Перед їжею", time_after: "Після їжі", time_sleep: "Перед сном",
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn_login: "Увайсці", no_account: "Няма акаўнта? ", btn_show_reg: "Зарэгістравацца",
             reg_title: "Рэгістрацыя", reg_user: "Прыдумайце лагін:", reg_pass: "Прыдумайце пароль:",
             btn_reg: "Стварыць акаўнт", has_account: "Ужо ёсць акаўнт? ", btn_show_login: "Увайсці",
-            app_title: "Дзённік Дыябетыка", btn_logout: "Выйсці", new_record: "Новы запіс", sugar_label: "Цукар (ммоль/л):",
+            app_title: "Дзённік Дыябетыка", btn_logout: "Выйсці", new_record: "Новы запіс", sugar_label: "Цукор (ммоль/л):",
             xe_label: "ХА:", xe_tooltip: "Хлебная адзінка (ХА) — мера вугляводаў. 1 ХА ≈ 10-12 г.",
             xe_ph: "Напр: 2.5", grams_label: "Грамы:", grams_ph: "Напр: 150", food_label: "Што вы елі:",
             food_none: "(Не пазначаю)", food_kasha: "Каша / Крупы", food_soup: "Суп", food_meat: "Мяса / Рыба",
@@ -164,9 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
             notes_label: "Нататкі (самаадчуванне):", btn_save: "Захаваць", btn_cancel: "Скасаваць",
             filter_title: "Перыяд справаздачы", btn_apply: "Ужыць", btn_reset: "Скінуць",
             stats_title: "Статыстыка", stats_avg: "Сярэдні цукар: ", mmol: "ммоль/л", stats_total: " | Усяго запісаў: ",
-            hist_title: "Гісторыя вымераў", btn_export: "⬇ Спампаваць для лекара", th_date: "Дата", th_sugar: "Цукар",
+            hist_title: "Гісторыя вымераў", btn_export: "⬇ Спампаваць для лекара", th_date: "Дата", th_sugar: "Цукор",
             th_xe: "ХА / Грамы", th_food: "Ежа / Кантэкст", th_actions: "Дзеянні", btn_prev: "◀ Назад", btn_next: "Наперад ▶",
-            chart_label: "Цукар (ммоль/л)", btn_update: "Абнавіць запіс", edit_title: "Рэдагаванне",
+            chart_label: "Цукор (ммоль/л)", btn_update: "Абнавіць запіс", edit_title: "Рэдагаванне",
             page_text: "Старонка {0} з {1}", welcome_user: "Прывітанне, {0}!", confirm_del: "Дакладна выдаліць?", unit_xe: "ХА", unit_g: "г"
         },
         kk: {
@@ -521,4 +521,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     checkSession();
+
+    // --- НОВОЕ: Регистрация Service Worker для PWA ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('Service Worker зарегистрирован успешно. Область видимости:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Ошибка регистрации Service Worker:', error);
+                });
+        });
+    }
 });
