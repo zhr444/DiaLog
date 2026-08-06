@@ -3,74 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Дневник Диабетика</title>
+    <title>DiaLog</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/icon.png') }}">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Подключаем библиотеку Chart.js для построения графиков -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Дневник Диабетика</h1>
-        
-        <div class="form-section">
-            <h2>Новая запись</h2>
-            <form id="sugarForm">
-                <div class="form-group">
-                    <label for="sugar">Уровень сахара (ммоль/л):</label>
-                    <input type="number" step="0.1" id="sugar" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="context">Время замера:</label>
-                    <select id="context" required>
-                        <option value="Натощак">Натощак</option>
-                        <option value="Перед едой">Перед едой</option>
-                        <option value="После еды">После еды</option>
-                        <option value="Перед сном">Перед сном</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="notes">Заметки (еда, самочувствие):</label>
-                    <textarea id="notes" rows="3"></textarea>
-                </div>
-                
-                <button type="submit">Сохранить</button>
-            </form>
-            <div id="message"></div>
+        <div class="top-controls">
+            <button id="themeToggle" class="theme-btn" data-i18n="theme_dark">🌙 Темная тема</button>
+            <select id="langSelect" class="theme-btn lang-select">
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="zh">🇨🇳 中文</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="uk">🇺🇦 Українська</option>
+                <option value="be">🇧🇾 Беларуская</option>
+                <option value="kk">🇰🇿 Қазақша</option>
+                <option value="uz">🇺🇿 O'zbekcha</option>
+            </select>
         </div>
 
-        <div class="stats-section">
-            <h3>Статистика за 7 дней</h3>
-            <p>Средний сахар: <strong id="avgSugar">0</strong> ммоль/л | Всего замеров: <strong id="totalLogs">0</strong></p>
+        <div id="auth-section">
+            <h1 style="text-align: center;" data-i18n="welcome">Добро пожаловать в DiaLog</h1>
+            <div id="loginBox" class="form-section">
+                <h2 data-i18n="login_title">Вход</h2>
+                <form id="loginForm">
+                    <div class="form-group"><label data-i18n="user_label">Логин:</label><input type="text" id="loginUsername" required></div>
+                    <div class="form-group"><label data-i18n="pass_label">Пароль:</label><input type="password" id="loginPassword" required></div>
+                    <button type="submit" data-i18n="btn_login">Войти</button>
+                </form>
+                <p class="auth-toggle"><span data-i18n="no_account">Нет аккаунта?</span> <a href="#" id="showRegister" data-i18n="btn_show_reg">Зарегистрироваться</a></p>
+            </div>
+            <div id="registerBox" class="form-section hidden">
+                <h2 data-i18n="reg_title">Регистрация</h2>
+                <form id="registerForm">
+                    <div class="form-group"><label data-i18n="reg_user">Придумайте логин:</label><input type="text" id="regUsername" required></div>
+                    <div class="form-group"><label data-i18n="reg_pass">Придумайте пароль:</label><input type="password" id="regPassword" required></div>
+                    <button type="submit" style="background-color: #27ae60;" data-i18n="btn_reg">Создать аккаунт</button>
+                </form>
+                <p class="auth-toggle"><span data-i18n="has_account">Уже есть аккаунт?</span> <a href="#" id="showLogin" data-i18n="btn_show_login">Войти</a></p>
+            </div>
+            <div id="authMessage" style="text-align: center; margin-top: 15px; font-weight: bold;"></div>
         </div>
 
-        <!-- Новый блок для отрисовки графика -->
-        <div class="chart-section">
-            <canvas id="sugarChart"></canvas>
-        </div>
+        <div id="app-section" class="hidden">
+            <div class="header-flex">
+                <h1 data-i18n="app_title">Дневник Диабетика</h1>
+                <div class="user-controls">
+                    <span id="welcomeUser"></span>
+                    <!-- НОВАЯ КНОПКА АДМИНА -->
+                    <a href="/admin" id="adminBtn" class="action-btn hidden" style="margin-left: 10px; text-decoration: none; padding: 6px 12px; font-size: 13px; display: inline-block;">👑 Админка</a>
+                    <button id="logoutBtn" class="delete-btn" style="margin-left: 10px;" data-i18n="btn_logout">Выйти</button>
+                </div>
+            </div>
+            
+            <div class="form-section" id="recordFormSection">
+                <h2 id="formTitle" data-i18n="new_record">Новая запись</h2>
+                <form id="sugarForm">
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="sugar" data-i18n="sugar_label">Сахар (ммоль/л):</label>
+                            <input type="number" step="0.1" min="0.1" max="50" id="sugar" required>
+                        </div>
+                        <div class="form-group col">
+                            <label for="breadUnits">
+                                <span data-i18n="xe_label">ХЕ:</span> 
+                                <span class="help-tooltip">?<span class="help-tooltip-text" data-i18n="xe_tooltip">Хлебная единица (ХЕ) — мера углеводов. 1 ХЕ ≈ 10-12 г углеводов.</span></span>
+                            </label>
+                            <input type="number" step="0.1" min="0" id="breadUnits" data-i18n-ph="xe_ph" placeholder="Напр: 2.5">
+                        </div>
+                        <div class="form-group col">
+                            <label for="portion" data-i18n="grams_label">Граммы:</label>
+                            <input type="number" min="0" id="portion" data-i18n-ph="grams_ph" placeholder="Напр: 150">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label for="foodSelect" data-i18n="food_label">Что ты ел:</label>
+                            <select id="foodSelect">
+                                <option value="" data-i18n="food_none">(Не указываю)</option>
+                                <option value="Каша / Крупы" data-i18n="food_kasha">Каша / Крупы</option>
+                                <option value="Суп" data-i18n="food_soup">Суп</option>
+                                <option value="Мясо / Рыба с гарниром" data-i18n="food_meat">Мясо / Рыба с гарниром</option>
+                                <option value="Овощи / Салат" data-i18n="food_veg">Овощи / Салат</option>
+                                <option value="Фрукты / Ягоды" data-i18n="food_fruit">Фрукты / Ягоды</option>
+                                <option value="Сладкое / Десерт" data-i18n="food_sweet">Сладкое / Десерт</option>
+                                <option value="Фастфуд / Снеки" data-i18n="food_fast">Фастфуд / Снеки</option>
+                                <option value="Другое" data-i18n="food_other">Другое (напишу сам)...</option>
+                            </select>
+                            <input type="text" id="foodCustom" class="hidden" data-i18n-ph="food_custom_ph" placeholder="Напиши свою еду..." style="margin-top: 8px;">
+                        </div>
 
-        <div class="history-section">
-            <h2>История замеров</h2>
-            <div class="table-responsive">
-                <table id="historyTable">
-                    <thead>
-                        <tr>
-                            <th>Дата и время</th>
-                            <th>Сахар</th>
-                            <th>Контекст</th>
-                            <th>Заметки</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyBody">
-                        <!-- Сюда данные будут подгружаться через JS -->
-                    </tbody>
-                </table>
+                        <div class="form-group col">
+                            <label for="context" data-i18n="time_label">Время замера:</label>
+                            <select id="context" required>
+                                <option value="Натощак" data-i18n="time_fast">Натощак</option>
+                                <option value="Перед едой" data-i18n="time_before">Перед едой</option>
+                                <option value="После еды" data-i18n="time_after">После еды</option>
+                                <option value="Перед сном" data-i18n="time_sleep">Перед сном</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes" data-i18n="notes_label">Заметки (самочувствие):</label>
+                        <textarea id="notes" rows="2"></textarea>
+                    </div>
+                    <button type="submit" id="submitBtn" data-i18n="btn_save">Сохранить</button>
+                    <button type="button" id="cancelEditBtn" class="hidden" style="background-color: #95a5a6; margin-top: 10px;" data-i18n="btn_cancel">Отменить редактирование</button>
+                </form>
+                <div id="message"></div>
+            </div>
+
+            <div class="filter-section">
+                <h3 data-i18n="filter_title">Период отчета</h3>
+                <div class="filter-row">
+                    <input type="date" id="filterStart">
+                    <input type="date" id="filterEnd">
+                    <button id="applyFilterBtn" class="action-btn" data-i18n="btn_apply">Применить фильтр</button>
+                    <button id="resetFilterBtn" class="cancel-btn" data-i18n="btn_reset">Сбросить</button>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h3 data-i18n="stats_title">Статистика (по фильтру)</h3>
+                <p>
+                    <span data-i18n="stats_avg">Средний сахар: </span><strong id="avgSugar">0</strong> <span data-i18n="mmol">ммоль/л</span> 
+                    <span data-i18n="stats_total"> | Всего замеров: </span><strong id="totalLogs">0</strong>
+                </p>
+            </div>
+
+            <div class="chart-section"><canvas id="sugarChart"></canvas></div>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <h2 data-i18n="hist_title">История замеров</h2>
+                    <div>
+                        <button id="exportFilteredBtn" class="export-btn" data-i18n="btn_export">⬇ CSV</button>
+                        <button id="exportPdfBtn" class="export-btn" style="background-color: #e74c3c; margin-left: 10px;" data-i18n="btn_pdf">📄 PDF</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th data-i18n="th_date">Дата</th>
+                                <th data-i18n="th_sugar">Сахар</th>
+                                <th data-i18n="th_xe">ХЕ / Граммы</th>
+                                <th data-i18n="th_food">Еда / Контекст</th>
+                                <th data-i18n="th_actions">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+                </div>
+                <div class="pagination-controls">
+                    <button id="prevPageBtn" data-i18n="btn_prev">◀ Назад</button>
+                    <span id="pageIndicator">Страница 1 из 1</span>
+                    <button id="nextPageBtn" data-i18n="btn_next">Вперед ▶</button>
+                </div>
             </div>
         </div>
     </div>
-
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
