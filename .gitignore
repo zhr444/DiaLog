@@ -1,1 +1,11 @@
+# Среда разработки и кэш
+.venv/
+__pycache__/
 
+# База данных
+dialog.db
+
+# Старые черновики и SQL-запросы
+SQLQuery1.sql
+SQLQuery2.sql
+вебс код03082026.txt
