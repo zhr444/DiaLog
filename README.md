@@ -67,5 +67,5 @@
 
 1. **Клонируйте репозиторий:**
    ```bash
-   git clone [https://github.com/ВАШ_ЛОГИН/dialog-app.git](https://github.com/ВАШ_ЛОГИН/dialog-app.git)
+   git clone [https://github.com/YOUR_LOGIN/dialog-app.git](https://github.com/YOUR_LOGIN/dialog-app.git)
    cd dialog-app
